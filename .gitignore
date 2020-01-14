@@ -1,0 +1,8 @@
+# environment variables
+.env
+
+# redis dump
+dump.rdb
+
+# ide
+.idea

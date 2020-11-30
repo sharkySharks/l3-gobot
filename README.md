@@ -1,5 +1,7 @@
 # L3-Gobot
 
+![l3-37](l337.gif)
+
 A Slack bot inspired by [Hubot](https://hubot.github.com/) written in Golang using the [go-joe/joe](https://github.com/go-joe/joe) library. 
 
 Named after the piloting droid [L3-37](https://starwars.fandom.com/wiki/L3-37), aka L3.

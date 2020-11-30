@@ -41,7 +41,8 @@ func main() {
 		),
 	}
 
-	b.Respond("run jenkins job", b.ExecuteJenkinsJob)
+	b.Respond("ping", b.Pong)
+	b.Respond("run jenkins job (.+)", b.ExecuteJenkinsJob)
 	b.Respond("remember (.+) is (.+)", b.Remember)
 	b.Respond("what is (.+)", b.WhatIs)
 	b.Respond("show keys", b.ShowKeys)
@@ -52,8 +53,13 @@ func main() {
 	}
 }
 
+func (b *L337Bot) Pong(msg l3.Message) error {
+	msg.Respond("PONG")
+	return nil
+}
+
 func (b *L337Bot) ExecuteJenkinsJob(msg l3.Message) error {
-	url := fmt.Sprintf("%s/job/git-corp-connection-check/build", os.Getenv("JENKINS_URL"))
+	url := fmt.Sprintf("%s/job/%s/build", os.Getenv("JENKINS_URL"), msg.Matches[0])
 	res, err := b.sendJenkinsRequest("POST", url, "")
 	if err != nil {
 		return err
@@ -80,7 +86,7 @@ func (b *L337Bot) sendJenkinsRequest(method string, url string, body string) (*h
 	client := &http.Client{}
 	res, e := client.Do(req)
 	if e != nil {
-		errMsg := fmt.Sprintf("Error sending Jenkins API request: ", e)
+		errMsg := fmt.Sprintf("Error sending Jenkins API request: %v", e)
 		return nil, errors.New(errMsg)
 	}
 	return res, nil
@@ -100,7 +106,7 @@ func (b *L337Bot) getJenkinsBuildInfo(url string) (string, error) {
 	s := new(Jenkins)
 	unmarshallError := json.Unmarshal(body, &s)
 	if unmarshallError != nil {
-		log.Error("Unmarshalling error: ", unmarshallError)
+		log.Errorf("Unmarshalling error: %v", unmarshallError)
 		return "", unmarshallError
 	}
 	return s.Job.Url, nil
